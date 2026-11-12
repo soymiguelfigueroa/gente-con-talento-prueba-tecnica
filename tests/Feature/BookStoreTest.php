@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Book;
 use App\Models\Category;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -10,6 +11,33 @@ it('requires all mandatory fields when storing a book', function () {
 
     $response->assertSessionHasErrors(['title', 'author', 'published_year', 'category_id']);
     $this->assertDatabaseCount('books', 0);
+});
+
+it('shows validation messages when storing a book with invalid data', function () {
+    $category = Category::factory()->create();
+
+    $this->from('/books/create')->followingRedirects()->post('/books', [
+        'title' => 'AB',
+        'author' => 'A valid author',
+        'published_year' => '2024',
+        'category_id' => $category->id,
+    ])
+        ->assertOk()
+        ->assertSeeText('The title field must be at least 3 characters.');
+});
+
+it('shows validation messages when updating a book with invalid data', function () {
+    $book = Book::factory()->create();
+
+    $this->from('/books/'.$book->id.'/edit')->followingRedirects()->put('/books/'.$book->id, [
+        'title' => 'AB',
+        'author' => $book->author,
+        'description' => $book->description,
+        'published_year' => $book->published_year,
+        'category_id' => $book->category_id,
+    ])
+        ->assertOk()
+        ->assertSeeText('The title field must be at least 3 characters.');
 });
 
 it('rejects invalid book field values', function (array $invalidData, string $field) {

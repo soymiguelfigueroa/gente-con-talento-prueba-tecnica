@@ -18,3 +18,24 @@ it('shows categories and navigation links', function () {
         ->assertSee('href="'.url('/books').'"', false)
         ->assertSee('href="'.url('/categories').'"', false);
 });
+
+it('shows validation messages when storing a duplicate category', function () {
+    Category::factory()->create(['name' => 'Arte']);
+
+    $this->from('/categories/create')->followingRedirects()->post('/categories', [
+        'name' => 'Arte',
+    ])
+        ->assertOk()
+        ->assertSeeText('The name has already been taken.');
+});
+
+it('shows validation messages when updating a category to a duplicate name', function () {
+    $category = Category::factory()->create(['name' => 'Arte']);
+    Category::factory()->create(['name' => 'Historia']);
+
+    $this->from('/categories/'.$category->id.'/edit')->followingRedirects()->put('/categories/'.$category->id, [
+        'name' => 'Historia',
+    ])
+        ->assertOk()
+        ->assertSeeText('The name has already been taken.');
+});
