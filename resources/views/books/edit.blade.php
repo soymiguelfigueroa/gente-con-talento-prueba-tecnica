@@ -18,6 +18,9 @@
                 required
                 class="rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
             >
+            @error('title')
+                <p class="text-sm text-red-600" role="alert">{{ $message }}</p>
+            @enderror
         </div>
 
         <div class="flex flex-col gap-1">
@@ -30,6 +33,9 @@
                 required
                 class="rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
             >
+            @error('author')
+                <p class="text-sm text-red-600" role="alert">{{ $message }}</p>
+            @enderror
         </div>
 
         <div class="flex flex-col gap-1">
@@ -40,6 +46,9 @@
                 rows="4"
                 class="rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
             >{{ old('description', $book->description) }}</textarea>
+            @error('description')
+                <p class="text-sm text-red-600" role="alert">{{ $message }}</p>
+            @enderror
         </div>
 
         <div class="flex flex-col gap-1">
@@ -52,6 +61,9 @@
                 required
                 class="rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
             >
+            @error('published_year')
+                <p class="text-sm text-red-600" role="alert">{{ $message }}</p>
+            @enderror
         </div>
 
         <div class="flex flex-col gap-1">
@@ -69,6 +81,9 @@
                     </option>
                 @endforeach
             </select>
+            @error('category_id')
+                <p class="text-sm text-red-600" role="alert">{{ $message }}</p>
+            @enderror
         </div>
 
         <div class="flex flex-wrap gap-3">
