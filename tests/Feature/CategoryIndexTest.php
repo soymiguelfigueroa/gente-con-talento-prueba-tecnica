@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Book;
 use App\Models\Category;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -38,4 +39,71 @@ it('shows validation messages when updating a category to a duplicate name', fun
     ])
         ->assertOk()
         ->assertSeeText('The name has already been taken.');
+});
+
+it('flashes and displays a message when creating a category', function () {
+    $response = $this->post('/categories', [
+        'name' => 'Ciencia',
+    ]);
+
+    $response->assertRedirect('/categories')
+        ->assertSessionHas('success', 'La categoría se creó correctamente.');
+
+    $this->get('/categories')
+        ->assertOk()
+        ->assertSeeText('La categoría se creó correctamente.');
+
+    $this->assertDatabaseHas('categories', ['name' => 'Ciencia']);
+});
+
+it('flashes and displays a message when updating a category', function () {
+    $category = Category::factory()->create(['name' => 'Arte']);
+
+    $response = $this->put('/categories/'.$category->id, [
+        'name' => 'Ciencia',
+    ]);
+
+    $response->assertRedirect('/categories')
+        ->assertSessionHas('success', 'La categoría se actualizó correctamente.');
+
+    $this->get('/categories')
+        ->assertOk()
+        ->assertSeeText('La categoría se actualizó correctamente.');
+
+    $this->assertDatabaseHas('categories', [
+        'id' => $category->id,
+        'name' => 'Ciencia',
+    ]);
+});
+
+it('flashes and displays a message when deleting a category', function () {
+    $category = Category::factory()->create();
+
+    $response = $this->delete('/categories/'.$category->id);
+
+    $response->assertRedirect('/categories')
+        ->assertSessionHas('success', 'La categoría se eliminó correctamente.');
+
+    $this->get('/categories')
+        ->assertOk()
+        ->assertSeeText('La categoría se eliminó correctamente.');
+
+    $this->assertDatabaseMissing('categories', ['id' => $category->id]);
+});
+
+it('flashes and displays the validation message when deleting a category with books', function () {
+    $category = Category::factory()->create();
+    $book = Book::factory()->create(['category_id' => $category->id]);
+
+    $response = $this->from('/categories')->delete('/categories/'.$category->id);
+
+    $response->assertRedirect('/categories')
+        ->assertSessionHas('error', 'No se puede eliminar una categoría que tiene libros asociados.');
+
+    $this->get('/categories')
+        ->assertOk()
+        ->assertSeeText('No se puede eliminar una categoría que tiene libros asociados.');
+
+    $this->assertDatabaseHas('categories', ['id' => $category->id]);
+    $this->assertDatabaseHas('books', ['id' => $book->id]);
 });

@@ -72,7 +72,13 @@ it('stores a book with valid data', function () {
         'category_id' => $category->id,
     ]);
 
-    $response->assertOk();
+    $response->assertRedirect('/books')
+        ->assertSessionHas('success', 'El libro se creó correctamente.');
+
+    $this->get('/books')
+        ->assertOk()
+        ->assertSeeText('El libro se creó correctamente.');
+
     $this->assertDatabaseHas('books', [
         'title' => 'A valid title',
         'author' => 'A valid author',
@@ -80,4 +86,45 @@ it('stores a book with valid data', function () {
         'published_year' => 2024,
         'category_id' => $category->id,
     ]);
+});
+
+it('flashes and displays a message when updating a book', function () {
+    $book = Book::factory()->create();
+    $category = Category::factory()->create();
+
+    $response = $this->put('/books/'.$book->id, [
+        'title' => 'Updated title',
+        'author' => 'Updated author',
+        'description' => 'Updated description',
+        'published_year' => '2024',
+        'category_id' => $category->id,
+    ]);
+
+    $response->assertRedirect('/books')
+        ->assertSessionHas('success', 'El libro se actualizó correctamente.');
+
+    $this->get('/books')
+        ->assertOk()
+        ->assertSeeText('El libro se actualizó correctamente.');
+
+    $this->assertDatabaseHas('books', [
+        'id' => $book->id,
+        'title' => 'Updated title',
+        'author' => 'Updated author',
+    ]);
+});
+
+it('flashes and displays a message when deleting a book', function () {
+    $book = Book::factory()->create();
+
+    $response = $this->delete('/books/'.$book->id);
+
+    $response->assertRedirect('/books')
+        ->assertSessionHas('success', 'El libro se eliminó correctamente.');
+
+    $this->get('/books')
+        ->assertOk()
+        ->assertSeeText('El libro se eliminó correctamente.');
+
+    $this->assertDatabaseMissing('books', ['id' => $book->id]);
 });
