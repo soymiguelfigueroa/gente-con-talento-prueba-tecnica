@@ -34,13 +34,10 @@ class BookController extends Controller
     public function store(BookRequest $request)
     {
         $data = $request->validated();
-        $book = $this->bookService->storeBook($data);
 
-        $books = $this->bookService->getAvailableBooks();
-        $categories = Category::query()->orderBy('name')->get();
-        $categoryId = null;
+        $this->bookService->storeBook($data);
 
-        return view('books.index', compact('books', 'categories', 'categoryId'));
+        return redirect('/books')->with('success', 'El libro se creó correctamente.');
     }
 
     public function edit($id)
@@ -54,23 +51,15 @@ class BookController extends Controller
     public function update(BookRequest $request, $id)
     {
         $data = $request->validated();
-        $book = $this->bookService->updateBook($id, $data);
+        $this->bookService->updateBook($id, $data);
 
-        $books = $this->bookService->getAvailableBooks();
-        $categories = Category::query()->orderBy('name')->get();
-        $categoryId = null;
-
-        return view('books.index', compact('books', 'categories', 'categoryId'));
+        return redirect('/books')->with('success', 'El libro se actualizó correctamente.');
     }
 
     public function destroy($id)
     {
         $this->bookService->destroyBook($id);
 
-        $books = $this->bookService->getAvailableBooks();
-        $categories = Category::query()->orderBy('name')->get();
-        $categoryId = null;
-
-        return view('books.index', compact('books', 'categories', 'categoryId'));
+        return redirect('/books')->with('success', 'El libro se eliminó correctamente.');
     }
 }

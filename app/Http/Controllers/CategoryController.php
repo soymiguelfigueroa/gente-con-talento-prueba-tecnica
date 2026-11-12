@@ -6,6 +6,7 @@ use App\Http\Requests\CategoryRequest;
 use App\Services\CategoryService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class CategoryController extends Controller
 {
@@ -30,9 +31,7 @@ class CategoryController extends Controller
         $data = $request->validated();
         $this->categoryService->storeCategory($data);
 
-        $categories = $this->categoryService->getCategories();
-
-        return view('categories.index', compact('categories'));
+        return redirect('/categories')->with('success', 'La categoría se creó correctamente.');
     }
 
     public function edit($id)
@@ -47,17 +46,17 @@ class CategoryController extends Controller
         $data = $request->validated();
         $this->categoryService->updateCategory($id, $data);
 
-        $categories = $this->categoryService->getCategories();
-
-        return view('categories.index', compact('categories'));
+        return redirect('/categories')->with('success', 'La categoría se actualizó correctamente.');
     }
 
     public function destroy($id)
     {
-        $this->categoryService->destroyCategory($id);
+        try {
+            $this->categoryService->destroyCategory($id);
+        } catch (ValidationException $exception) {
+            return back()->with('error', $exception->errors()['category_id'][0]);
+        }
 
-        $categories = $this->categoryService->getCategories();
-
-        return view('categories.index', compact('categories'));
+        return redirect('/categories')->with('success', 'La categoría se eliminó correctamente.');
     }
 }

@@ -38,6 +38,18 @@
             @yield('actions')
         </header>
 
+        @if (session('success'))
+            <div class="mb-6 rounded-md border border-green-200 bg-green-50 p-4 text-sm text-green-800" role="status" aria-live="polite">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if (session('error'))
+            <div class="mb-6 rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-800" role="alert" aria-live="assertive">
+                {{ session('error') }}
+            </div>
+        @endif
+
         @yield('content')
     </main>
 </body>
