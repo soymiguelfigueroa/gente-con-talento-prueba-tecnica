@@ -26,6 +26,8 @@ it('shows only books from the selected category', function () {
         ->assertDontSee('Libro de historia')
         ->assertSee('value="'.$selectedCategory->id.'" selected', false)
         ->assertSee('Historia')
+        ->assertSee('href="'.url('/books').'"', false)
+        ->assertSee('href="'.url('/categories').'"', false)
         ->assertSee('href="'.url('/books/'.$selectedBook->id.'/edit').'"', false)
         ->assertSee('action="'.url('/books/'.$selectedBook->id).'"', false)
         ->assertSee('name="_method" value="DELETE"', false)
